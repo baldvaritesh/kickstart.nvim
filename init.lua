@@ -110,6 +110,18 @@ vim.o.relativenumber = true
 vim.o.smartindent = true
 vim.o.wrap = false
 vim.o.colorcolumn = '80'
+vim.o.fillchars = {
+  diff = '╱',
+}
+vim.o.diffopt = {
+  'internal',
+  'filler',
+  'closeoff',
+  'context:12',
+  'algorithm:histogram',
+  'linematch:200',
+  'indent-heuristic',
+}
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.o.relativenumber = true
