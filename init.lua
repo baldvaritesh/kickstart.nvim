@@ -114,6 +114,7 @@ vim.o.fillchars = {
   diff = '╱',
 }
 vim.o.diffopt = {
+  'vertical',
   'internal',
   'filler',
   'closeoff',
@@ -233,6 +234,20 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+vim.keymap.set('n', '<leader>th', function()
+  local file_dir = vim.fn.expand '%:p:h'
+  vim.cmd 'split'
+  vim.cmd('lcd ' .. file_dir)
+  vim.cmd 'terminal'
+end, { desc = 'Open terminal in file directory (horizontal)' })
+
+vim.keymap.set('n', '<leader>tv', function()
+  local file_dir = vim.fn.expand '%:p:h'
+  vim.cmd 'vsplit'
+  vim.cmd('lcd ' .. file_dir)
+  vim.cmd 'terminal'
+end, { desc = 'Open terminal in file directory (vertical)' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -446,9 +461,10 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
+      vim.keymap.set('n', '<leader>se', builtin.git_status, { desc = '[S]earch [E]dited files' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>sF', function()
-        builtin.lsp_document_symbols { symbols = 'function' }
+        builtin.lsp_document_symbols()
       end, { desc = '[S]earch [F]unctions }' })
 
       -- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
@@ -629,6 +645,42 @@ require('lazy').setup({
         end,
       })
 
+      -- Diagnostic Config
+      -- See :help vim.diagnostic.Opts
+      vim.diagnostic.config {
+        severity_sort = true,
+        float = { border = 'rounded', source = 'if_many' },
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        signs = vim.g.have_nerd_font and {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '󰅚 ',
+            [vim.diagnostic.severity.WARN] = '󰀪 ',
+            [vim.diagnostic.severity.INFO] = '󰋽 ',
+            [vim.diagnostic.severity.HINT] = '󰌶 ',
+          },
+        } or {},
+        virtual_text = false,
+        --virtual_text = {
+        --  source = 'if_many',
+        --  spacing = 2,
+        --  format = function(diagnostic)
+        --    local diagnostic_message = {
+        --      [vim.diagnostic.severity.ERROR] = diagnostic.message,
+        --      [vim.diagnostic.severity.WARN] = diagnostic.message,
+        --      [vim.diagnostic.severity.INFO] = diagnostic.message,
+        --      [vim.diagnostic.severity.HINT] = diagnostic.message,
+        --    }
+        --    return diagnostic_message[diagnostic.severity]
+        --  end,
+        --},
+      }
+
+      -- LSP servers and clients are able to communicate to each other what features they support.
+      --  By default, Neovim doesn't support everything that is in the LSP specification.
+      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
@@ -637,7 +689,8 @@ require('lazy').setup({
         -- clangd = {},
         gopls = {},
         pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
+        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
@@ -881,7 +934,7 @@ require('lazy').setup({
     config = function(_, opts)
       require('catppuccin').setup(opts)
       -- Set colorscheme after options
-      vim.cmd.colorscheme 'catppuccin'
+      vim.cmd.colorscheme 'catppuccin-mocha'
     end,
   },
 
@@ -984,6 +1037,23 @@ require('lazy').setup({
       })
     end,
   },
+  {
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-neotest/nvim-nio',
+      'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      'fredrikaverpil/neotest-golang',
+    },
+    config = function()
+      require('neotest').setup {
+        adapters = {
+          require 'neotest-golang',
+        },
+      }
+    end,
+  },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -994,10 +1064,10 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
 
