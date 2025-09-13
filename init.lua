@@ -949,6 +949,9 @@ require('lazy').setup({
     opts = { signs = false },
   },
 
+  -- Help neck on wide monitors
+  { 'shortcuts/no-neck-pain.nvim', version = '*' },
+
   { -- Collection of various small independent plugins/modules
     'nvim-mini/mini.nvim',
     config = function()
