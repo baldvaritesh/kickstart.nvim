@@ -686,7 +686,16 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       ---@type table<string, vim.lsp.Config>
       local servers = {
-        -- clangd = {},
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy', -- enable clang-tidy
+            '--clang-tidy-checks=*', -- run all tidy checks
+            '--completion-style=detailed',
+            '--header-insertion=iwyu',
+          },
+        },
         gopls = {},
         pyright = {},
         rust_analyzer = {},
@@ -774,12 +783,15 @@ require('lazy').setup({
           args = { 'format', '--stdin-filename', '$FILENAME', '-' },
           stdin = true,
         },
+        clang_format = {
+          prepend_args = { '--style=file' }, -- looks for .clang-format file in project dir
+        },
       },
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = false, cpp = false }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
@@ -793,6 +805,9 @@ require('lazy').setup({
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
         python = { 'ruff_format' },
+        rust = { 'rustfmt', lsp_format = 'fallback' },
+        c = { 'clang_format' },
+        cpp = { 'clang_format' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
