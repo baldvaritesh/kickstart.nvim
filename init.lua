@@ -296,6 +296,20 @@ require('lazy').setup({
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   'tpope/vim-fugitive',
   'sindrets/diffview.nvim',
+  {
+    'ldelossa/gh.nvim',
+    dependencies = {
+      {
+        'ldelossa/litee.nvim',
+        config = function()
+          require('litee.lib').setup()
+        end,
+      },
+    },
+    config = function()
+      require('litee.gh').setup()
+    end,
+  },
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
