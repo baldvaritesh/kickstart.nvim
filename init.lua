@@ -795,11 +795,11 @@ require('lazy').setup({
       notify_on_error = false,
       -- Add the formatters section here
       formatters = {
-        ruff_format = {
-          command = 'ruff',
-          args = { 'format', '--stdin-filename', '$FILENAME', '-' },
-          stdin = true,
-        },
+        -- ruff_format = {
+        --   command = 'ruff',
+        --   args = { 'format', '--stdin-filename', '$FILENAME', '-' },
+        --   stdin = true,
+        -- },
         clang_format = {
           prepend_args = { '--style=file' }, -- looks for .clang-format file in project dir
         },
@@ -808,7 +808,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = false, cpp = false }
+        local disable_filetypes = { c = false, cpp = false, python = false }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
@@ -925,49 +925,59 @@ require('lazy').setup({
     },
   },
 
-  --{ -- You can easily change to a different colorscheme.
-  --  -- Change the name of the colorscheme plugin below, and then
-  --  -- change the command in the config to whatever the name of that colorscheme is.
-  --  --
-  --  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  --  'folke/tokyonight.nvim',
-  --  priority = 1000, -- Make sure to load this before all the other start plugins.
-  --  config = function()
-  --    ---@diagnostic disable-next-line: missing-fields
-  --    require('tokyonight').setup {
-  --      styles = {
-  --        comments = { italic = false }, -- Disable italics in comments
-  --      },
-  --    }
+  { -- You can easily change to a different colorscheme.
+    -- Change the name of the colorscheme plugin below, and then
+    -- change the command in the config to whatever the name of that colorscheme is.
+    --
+    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+    'folke/tokyonight.nvim',
+    priority = 1000, -- Make sure to load this before all the other start plugins.
+    config = function()
+      ---@diagnostic disable-next-line: missing-fields
+      require('tokyonight').setup {
+        styles = {
+          comments = { italic = false }, -- Disable italics in comments
+        },
+      }
 
-  --    -- Load the colorscheme here.
-  --    -- Like many other themes, this one has different styles, and you could load
-  --    -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  --    vim.cmd.colorscheme 'tokyonight-night'
+      -- Load the colorscheme here.
+      -- Like many other themes, this one has different styles, and you could load
+      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+      vim.cmd.colorscheme 'tokyonight-night'
+    end,
+  },
+  --{
+  --  'catppuccin/nvim',
+  --  priority = 1000, -- Make sure to load this before all the other start plugins.
+  --  opts = {
+  --    flavor = 'mocha',
+  --    no_italic = true,
+  --    term_colors = true,
+  --    styles = {
+  --      comments = {},
+  --    },
+  --    integrations = {
+  --      telescope = {
+  --        enabled = true,
+  --      },
+  --    },
+  --  },
+
+  --  config = function(_, opts)
+  --    require('catppuccin').setup(opts)
+  --    -- Set colorscheme after options
+  --    vim.cmd.colorscheme 'catppuccin-mocha'
   --  end,
   --},
-  {
-    'catppuccin/nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    opts = {
-      flavor = 'mocha',
-      no_italic = true,
-      term_colors = true,
-      styles = {
-        comments = {},
-      },
-      integrations = {
-        telescope = {
-          enabled = true,
-        },
-      },
-    },
 
-    config = function(_, opts)
-      require('catppuccin').setup(opts)
-      -- Set colorscheme after options
-      vim.cmd.colorscheme 'catppuccin-mocha'
-    end,
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
   },
 
   -- Highlight todo, notes, etc in comments
