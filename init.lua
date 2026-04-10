@@ -708,9 +708,21 @@ require('lazy').setup({
           },
           filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
         },
-        gopls = {},
-        pyright = {},
-        rust_analyzer = {},
+        gopls = {
+          cmd = { 'gopls' },
+          filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+          root_markers = { 'go.work', 'go.mod', '.git' },
+        },
+        pyright = {
+          cmd = { 'pyright-langserver', '--stdio' },
+          filetypes = { 'python' },
+          root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'pyrightconfig.json', '.git' },
+        },
+        rust_analyzer = {
+          cmd = { 'rust-analyzer' },
+          filetypes = { 'rust' },
+          root_markers = { 'Cargo.toml', 'rust-project.json', '.git' },
+        },
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
