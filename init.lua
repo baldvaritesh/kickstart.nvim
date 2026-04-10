@@ -1034,7 +1034,7 @@ require('lazy').setup({
     config = function()
       -- ensure basic parser are installed
       local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'go', 'python', 'rust' }
-      require('nvim-treesitter.install').ensure_installed(parsers)
+      require('nvim-treesitter.install').install(parsers)
 
       ---@param buf integer
       ---@param language string
@@ -1063,8 +1063,8 @@ require('lazy').setup({
           -- try to attach treesitter; if parser isn't installed, auto-install it
           local ok = pcall(vim.treesitter.start, buf, language)
           if not ok then
-            local available = require('nvim-treesitter.parsers').available_parsers()
-            if vim.tbl_contains(available, language) then require('nvim-treesitter.install').ensure_installed { language } end
+            local parsers = require('nvim-treesitter.parsers')
+            if parsers[language] then require('nvim-treesitter.install').install { language } end
             pcall(vim.treesitter.start, buf, language)
           end
         end,
@@ -1102,7 +1102,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
