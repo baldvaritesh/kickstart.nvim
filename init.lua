@@ -808,6 +808,10 @@ require('lazy').setup({
         clang_format = {
           prepend_args = { '--style=file' }, -- looks for .clang-format file in project dir
         },
+        sqlfluff = {
+          args = { 'format', '--dialect=snowflake', '-' },
+          stdin = true,
+        },
       },
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
@@ -816,12 +820,12 @@ require('lazy').setup({
         local disable_filetypes = { c = false, cpp = false, python = false }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
-          }
         end
+        local timeout = vim.bo[bufnr].filetype == 'sql' and 3000 or 500
+        return {
+          timeout_ms = timeout,
+          lsp_format = 'fallback',
+        }
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
@@ -830,6 +834,7 @@ require('lazy').setup({
         rust = { 'rustfmt', lsp_format = 'fallback' },
         c = { 'clang_format' },
         cpp = { 'clang_format' },
+        sql = { 'sqlfluff' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -1033,7 +1038,7 @@ require('lazy').setup({
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
     config = function()
       -- ensure basic parser are installed
-      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'go', 'python', 'rust' }
+      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'go', 'python', 'rust', 'sql' }
       require('nvim-treesitter.install').install(parsers)
 
       ---@param buf integer
@@ -1063,7 +1068,7 @@ require('lazy').setup({
           -- try to attach treesitter; if parser isn't installed, auto-install it
           local ok = pcall(vim.treesitter.start, buf, language)
           if not ok then
-            local parsers = require('nvim-treesitter.parsers')
+            local parsers = require 'nvim-treesitter.parsers'
             if parsers[language] then require('nvim-treesitter.install').install { language } end
             pcall(vim.treesitter.start, buf, language)
           end
