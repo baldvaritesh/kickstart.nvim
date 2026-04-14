@@ -818,9 +818,7 @@ require('lazy').setup({
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = false, cpp = false, python = false }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        end
+        if disable_filetypes[vim.bo[bufnr].filetype] then return nil end
         local timeout = vim.bo[bufnr].filetype == 'sql' and 3000 or 500
         return {
           timeout_ms = timeout,
@@ -1140,6 +1138,12 @@ require('lazy').setup({
   {
     'karb94/neoscroll.nvim',
     config = function() require('neoscroll').setup {} end,
+  },
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+    -- Completion for `blink.cmp`
+    -- dependencies = { "saghen/blink.cmp" },
   },
 }, {
   ui = {
