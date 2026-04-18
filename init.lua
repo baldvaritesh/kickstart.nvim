@@ -307,21 +307,7 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   'tpope/vim-fugitive',
-  {
-    'sindrets/diffview.nvim',
-    config = function()
-      require('diffview').setup {
-        hooks = {
-          diff_buf_win_enter = function()
-            vim.opt_local.wrap = true
-            vim.opt_local.linebreak = true
-            vim.opt_local.breakindent = true
-          end,
-        },
-      }
-      vim.opt.diffopt:append 'followwrap'
-    end,
-  },
+  'sindrets/diffview.nvim',
   {
     'ldelossa/gh.nvim',
     dependencies = {
