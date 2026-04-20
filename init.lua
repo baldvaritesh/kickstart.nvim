@@ -267,6 +267,15 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
+-- Stop lingering snippet sessions when leaving insert/select so <Tab>
+-- doesn't jump to a stale tabstop after re-entering insert mode.
+vim.api.nvim_create_autocmd('ModeChanged', {
+  pattern = { 's:n', 'i:n' },
+  callback = function()
+    if vim.snippet.active() then vim.snippet.stop() end
+  end,
+})
+
 -- Enable wrapping long lines for markdown files
 vim.api.nvim_create_augroup('MarkdownWrap', { clear = true })
 vim.api.nvim_create_autocmd('FileType', {
@@ -886,6 +895,8 @@ require('lazy').setup({
     ---@type blink.cmp.Config
     opts = {
       keymap = {
+        ['<Tab>'] = { 'select_and_accept', 'snippet_forward', 'fallback' },
+        ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
         -- 'default' (recommended) for mappings similar to built-in completions
         --   <c-y> to accept ([y]es) the completion.
         --    This will auto-import if your LSP supports it.
